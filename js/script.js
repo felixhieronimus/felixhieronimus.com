@@ -1079,8 +1079,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function updateWrapperAndImage(image) {
   const imageWidth = image.offsetWidth;
   const imageHeight = image.offsetHeight;
-
-  const containerHeight = imageHeight * 0.9;
+  const containerHeight = imageHeight * 0.9;//test
 
   let wrapper = image.closest(".parallax-container");
   if (!wrapper) {
@@ -1104,16 +1103,14 @@ function updateWrapperAndImage(image) {
 }
 
 function applyParallaxEffect(image, containerHeight) {
-  // Utiliser l'attribut data-parallax-range s'il est présent, sinon utiliser 0.2 comme valeur par défaut
   const parallaxDataAttribute = image.getAttribute('data-parallax-range');
   const parallaxRange = parallaxDataAttribute ? parseFloat(parallaxDataAttribute) * containerHeight : containerHeight * 0.1;
 
   function doParallax() {
     const windowHeight = window.innerHeight;
     const containerRect = image.parentElement.getBoundingClientRect();
-    const containerVisibleHeight = Math.min(containerRect.bottom, windowHeight) - Math.max(containerRect.top, 0);
-
-    if (containerVisibleHeight > 0) {
+    
+    if (containerRect.bottom > 0 && containerRect.top < windowHeight) { // Si l'image est visible
       const totalScrollableDistance = windowHeight + containerHeight;
       const scrolledEntryPosition = Math.min(windowHeight - containerRect.top, windowHeight);
       const percentageScrolledThroughContainer = scrolledEntryPosition / totalScrollableDistance;
@@ -1135,14 +1132,25 @@ function applyParallaxEffect(image, containerHeight) {
 }
 
 function initParallaxEffect() {
-  document.querySelectorAll(".parallax-image").forEach((image) => {
-    const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
+  const images = document.querySelectorAll(".parallax-image");
+
+  const resizeObserver = new ResizeObserver((entries) => {
+    for (let entry of entries) {
+      updateWrapperAndImage(entry.target);
+    }
+  });
+
+  const intersectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
         updateWrapperAndImage(entry.target);
       }
     });
+  });
 
-    observer.observe(image);
+  images.forEach((image) => {
+    resizeObserver.observe(image);
+    intersectionObserver.observe(image);
 
     if (image.complete) {
       updateWrapperAndImage(image);
@@ -1153,6 +1161,7 @@ function initParallaxEffect() {
 }
 
 document.addEventListener("DOMContentLoaded", initParallaxEffect);
+
 
 
 // --------------------------------PARALLAX-DIV-------------------------------
