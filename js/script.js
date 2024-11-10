@@ -1,3 +1,5 @@
+console.log('hello')
+
 function initProjectHoverAnimation() {
   document.querySelectorAll('.info-projetsuivant h2, .info-projetsuivant p').forEach(textElement => {
     // Assurez-vous que cette partie ne s'exécute pas plusieurs fois pour le même élément
